@@ -2,15 +2,9 @@ import { supabase, Person, Marriage } from './supabase'
 
 export interface TreeNode {
   id: string
-  type: 'personNode'
+  type: 'personNode' | 'generationNode'
   position: { x: number; y: number }
-  data: {
-    person: Person
-    spouses?: Person[]
-    isCollapsed?: boolean
-    hasChildren?: boolean
-    generation: number
-  }
+  data: any
 }
 
 export interface TreeEdge {
@@ -79,9 +73,9 @@ function buildSpouseMap(persons: Person[], marriages: Marriage[]): Map<string, P
   return spouseMap
 }
 
-const HORIZONTAL_SPACING = 220
-const VERTICAL_SPACING = 160
-const SPOUSE_OFFSET = 110
+const HORIZONTAL_SPACING = 150
+const VERTICAL_SPACING = 200
+const SPOUSE_OFFSET = 105
 
 // Layout the tree using BFS with custom positioning
 export function buildTreeLayout(
@@ -225,6 +219,29 @@ export function buildTreeLayout(
         style: { stroke: '#A5D6A7', strokeWidth: 1.5, strokeDasharray: '5,5' },
         data: { relation: 'spouse' },
         animated: false
+      })
+    }
+  }
+
+  // Add generation divider nodes
+  let minX = Infinity
+  let maxX = -Infinity
+  let maxDepth = 0
+
+  nodes.forEach(n => {
+    if (n.position.x < minX) minX = n.position.x
+    if (n.position.x > maxX) maxX = n.position.x
+    if (n.type === 'personNode' && n.data.generation > maxDepth) maxDepth = n.data.generation
+  })
+
+  if (minX !== Infinity && maxX !== -Infinity) {
+    const width = (maxX - minX) + 800 // extend on both sides
+    for (let gen = 1; gen <= maxDepth; gen++) {
+      nodes.push({
+        id: `gen-${gen}`,
+        type: 'generationNode',
+        position: { x: minX - 400, y: (gen - 1) * VERTICAL_SPACING - 30 },
+        data: { generation: gen, width }
       })
     }
   }
