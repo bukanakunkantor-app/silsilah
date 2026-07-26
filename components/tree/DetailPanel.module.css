@@ -1,0 +1,351 @@
+/* Desktop: side panel */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 360px;
+  background: var(--color-white);
+  overflow-y: auto;
+  padding: var(--space-8) var(--space-6) var(--space-6);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.12);
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+.dragHandle {
+  display: none;
+}
+
+.closeBtn {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  z-index: 10;
+}
+
+.closeBtn:hover {
+  background: #FFEBEE;
+  border-color: #FFCDD2;
+  color: #C62828;
+}
+
+/* ============================================================
+   Hero
+   ============================================================ */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.avatarWrapper {
+  position: relative;
+  margin-bottom: var(--space-4);
+}
+
+.avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--color-white);
+  box-shadow: var(--shadow-md);
+}
+
+.avatarDefault {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+}
+
+.avatarMale {
+  background: linear-gradient(135deg, #BBDEFB, #42A5F5);
+  color: #FFFFFF;
+}
+
+.avatarFemale {
+  background: linear-gradient(135deg, #FCE4EC, #EC407A);
+  color: #FFFFFF;
+}
+
+.statusBadge {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 600;
+  border: 2px solid var(--color-white);
+}
+
+.alive {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.deceased {
+  background: #F5F5F5;
+  color: #757575;
+}
+
+.name {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+  line-height: 1.3;
+}
+
+.nickname {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-bottom: var(--space-2);
+}
+
+.genderBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.genderMale {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+
+.genderFemale {
+  background: #FCE4EC;
+  color: #AD1457;
+}
+
+.heroInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* ============================================================
+   Info Grid
+   ============================================================ */
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.infoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.infoIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.infoLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: 500;
+  margin-bottom: 1px;
+}
+
+.infoValue {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.ageNote {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+/* ============================================================
+   Sections
+   ============================================================ */
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.bioSection {
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.bio {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+.relatedSection {
+  margin-top: var(--space-2);
+}
+
+.relatedList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.relatedItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-light);
+}
+
+.relatedAvatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.relatedAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.relatedMale {
+  background: linear-gradient(135deg, #BBDEFB, #90CAF9);
+  color: #1565C0;
+}
+
+.relatedFemale {
+  background: linear-gradient(135deg, #FCE4EC, #F48FB1);
+  color: #AD1457;
+}
+
+.relatedName {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   Mobile: Bottom Sheet
+   ============================================================ */
+@media (max-width: 768px) {
+  .panel {
+    position: absolute;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    top: auto;
+    width: 100%;
+    max-height: 75vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: var(--space-6) var(--space-5) var(--space-10);
+    animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+
+  .dragHandle {
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--color-border);
+    border-radius: 2px;
+    margin: 0 auto var(--space-4);
+  }
+
+  .hero {
+    flex-direction: row;
+    text-align: left;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .heroInfo {
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
+  .avatar, .avatarDefault {
+    width: 72px;
+    height: 72px;
+  }
+
+  .name {
+    font-size: var(--font-size-md);
+  }
+}

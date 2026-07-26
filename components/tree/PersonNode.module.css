@@ -1,0 +1,186 @@
+.node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 14px;
+  width: 100px;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--color-border-light);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  user-select: none;
+  text-align: center;
+}
+
+.node:hover {
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.node:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Gender variants */
+.male {
+  border-top: 3px solid var(--color-male);
+}
+
+.female {
+  border-top: 3px solid var(--color-female);
+}
+
+/* Highlighted (search result) */
+.highlighted {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25), var(--shadow-lg) !important;
+  transform: translateY(-3px) scale(1.02);
+  z-index: 10;
+}
+
+/* Dimmed (not in focus path) */
+.dimmed {
+  opacity: 0.35;
+  filter: grayscale(40%);
+}
+
+/* Deceased */
+.deceased {
+  background: #FAFAFA;
+  border-style: dashed;
+}
+
+.deceased .avatarDefault {
+  filter: grayscale(60%);
+}
+
+/* ============================================================
+   Avatar
+   ============================================================ */
+.avatarWrapper {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-border-light);
+}
+
+.avatarDefault {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+}
+
+.avatarMale {
+  background: linear-gradient(135deg, #BBDEFB, #90CAF9);
+  color: #1565C0;
+  border-color: #90CAF9;
+}
+
+.avatarFemale {
+  background: linear-gradient(135deg, #FCE4EC, #F48FB1);
+  color: #AD1457;
+  border-color: #F48FB1;
+}
+
+.aliveDot {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 11px;
+  height: 11px;
+  background: var(--color-alive);
+  border-radius: 50%;
+  border: 2px solid var(--color-white);
+  box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.3);
+}
+
+/* ============================================================
+   Info
+   ============================================================ */
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  word-break: break-word;
+  text-align: center;
+}
+
+.dates {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   Toggle Button
+   ============================================================ */
+.toggleBtn {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: 2px solid var(--color-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.4);
+  transition: all var(--transition-fast);
+  z-index: 5;
+}
+
+.toggleBtn:hover {
+  background: var(--color-primary-dark);
+  transform: translateX(-50%) scale(1.1);
+}
+
+.toggleBtn.collapsed {
+  background: var(--color-text-muted);
+}
+
+.toggleBtn.collapsed:hover {
+  background: var(--color-primary);
+}
+
+/* ============================================================
+   Handles
+   ============================================================ */
+.handle {
+  background: transparent !important;
+  border: none !important;
+  width: 8px !important;
+  height: 8px !important;
+}

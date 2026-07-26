@@ -1,0 +1,249 @@
+import { supabase, Person, Marriage } from './supabase'
+
+export interface TreeNode {
+  id: string
+  type: 'personNode'
+  position: { x: number; y: number }
+  data: {
+    person: Person
+    spouses?: Person[]
+    isCollapsed?: boolean
+    hasChildren?: boolean
+    generation: number
+  }
+}
+
+export interface TreeEdge {
+  id: string
+  source: string
+  target: string
+  type: 'smoothstep' | 'default'
+  style?: React.CSSProperties
+  animated?: boolean
+  data?: { relation: 'parent-child' | 'spouse' }
+}
+
+export interface FamilyData {
+  persons: Person[]
+  marriages: Marriage[]
+}
+
+// Fetch all family data from Supabase
+export async function fetchFamilyData(): Promise<FamilyData> {
+  const [personsResult, marriagesResult] = await Promise.all([
+    supabase.from('persons').select('*').order('generation', { ascending: true }).order('birth_date', { ascending: true }),
+    supabase.from('marriages').select('*')
+  ])
+
+  if (personsResult.error) throw personsResult.error
+  if (marriagesResult.error) throw marriagesResult.error
+
+  return {
+    persons: personsResult.data || [],
+    marriages: marriagesResult.data || []
+  }
+}
+
+// Build a map of parent -> children
+function buildChildrenMap(persons: Person[]): Map<string, Person[]> {
+  const map = new Map<string, Person[]>()
+  for (const person of persons) {
+    if (person.parent_id) {
+      const children = map.get(person.parent_id) || []
+      children.push(person)
+      map.set(person.parent_id, children)
+    }
+  }
+  return map
+}
+
+// Build spouse map from marriages
+function buildSpouseMap(persons: Person[], marriages: Marriage[]): Map<string, Person[]> {
+  const personMap = new Map(persons.map(p => [p.id, p]))
+  const spouseMap = new Map<string, Person[]>()
+
+  for (const marriage of marriages) {
+    const husband = personMap.get(marriage.husband_id)
+    const wife = personMap.get(marriage.wife_id)
+    if (!husband || !wife) continue
+
+    const husbandSpouses = spouseMap.get(marriage.husband_id) || []
+    if (!husbandSpouses.find(s => s.id === wife.id)) husbandSpouses.push(wife)
+    spouseMap.set(marriage.husband_id, husbandSpouses)
+
+    const wifeSpouses = spouseMap.get(marriage.wife_id) || []
+    if (!wifeSpouses.find(s => s.id === husband.id)) wifeSpouses.push(husband)
+    spouseMap.set(marriage.wife_id, wifeSpouses)
+  }
+
+  return spouseMap
+}
+
+const HORIZONTAL_SPACING = 220
+const VERTICAL_SPACING = 160
+const SPOUSE_OFFSET = 110
+
+// Layout the tree using BFS with custom positioning
+export function buildTreeLayout(
+  persons: Person[],
+  marriages: Marriage[],
+  collapsedNodes: Set<string>
+): { nodes: TreeNode[]; edges: TreeEdge[] } {
+  if (persons.length === 0) return { nodes: [], edges: [] }
+
+  const childrenMap = buildChildrenMap(persons)
+  const spouseMap = buildSpouseMap(persons, marriages)
+
+  // Find roots (no parent or parent not in our data)
+  const personIds = new Set(persons.map(p => p.id))
+  const roots = persons.filter(p => !p.parent_id || !personIds.has(p.parent_id))
+
+  const nodes: TreeNode[] = []
+  const edges: TreeEdge[] = []
+  const positioned = new Set<string>()
+
+  // BFS layout
+  let xCounter = 0
+
+  function layoutSubtree(person: Person, depth: number): number {
+    if (positioned.has(person.id)) return 0
+    positioned.add(person.id)
+
+    const children = collapsedNodes.has(person.id)
+      ? []
+      : (childrenMap.get(person.id) || [])
+
+    let subtreeWidth = 0
+    let childStartX = 0
+
+    if (children.length === 0) {
+      // Leaf node
+      const x = xCounter * HORIZONTAL_SPACING
+      xCounter++
+
+      const spouses = spouseMap.get(person.id) || []
+      nodes.push({
+        id: person.id,
+        type: 'personNode',
+        position: { x, y: depth * VERTICAL_SPACING },
+        data: {
+          person,
+          spouses,
+          isCollapsed: collapsedNodes.has(person.id),
+          hasChildren: (childrenMap.get(person.id) || []).length > 0,
+          generation: person.generation
+        }
+      })
+      return x
+    }
+
+    // Layout children first
+    const childPositions: number[] = []
+    childStartX = xCounter * HORIZONTAL_SPACING
+
+    for (const child of children) {
+      const childX = layoutSubtree(child, depth + 1)
+      childPositions.push(childX)
+
+      // Parent-child edge
+      edges.push({
+        id: `edge-${person.id}-${child.id}`,
+        source: person.id,
+        target: child.id,
+        type: 'smoothstep',
+        style: { stroke: '#81C784', strokeWidth: 2 },
+        data: { relation: 'parent-child' }
+      })
+    }
+
+    // Position parent above center of children
+    const parentX = children.length === 1
+      ? childPositions[0]
+      : (childPositions[0] + childPositions[childPositions.length - 1]) / 2
+
+    const spouses = spouseMap.get(person.id) || []
+    nodes.push({
+      id: person.id,
+      type: 'personNode',
+      position: { x: parentX, y: depth * VERTICAL_SPACING },
+      data: {
+        person,
+        spouses,
+        isCollapsed: collapsedNodes.has(person.id),
+        hasChildren: true,
+        generation: person.generation
+      }
+    })
+
+    return parentX
+  }
+
+  // Layout each root
+  let rootIndex = 0
+  for (const root of roots) {
+    if (rootIndex > 0) xCounter += 1 // gap between root trees
+    layoutSubtree(root, 0)
+    rootIndex++
+  }
+
+  // Add spouse nodes for marriages (displayed beside their spouse)
+  const addedSpouseNodes = new Set<string>()
+  for (const marriage of marriages) {
+    const husbandNode = nodes.find(n => n.id === marriage.husband_id)
+    const wifeNode = nodes.find(n => n.id === marriage.wife_id)
+
+    if (husbandNode && !wifeNode && !addedSpouseNodes.has(marriage.wife_id)) {
+      // Wife is a "married-in" person not in main tree
+      const wife = persons.find(p => p.id === marriage.wife_id)
+      if (wife) {
+        addedSpouseNodes.add(wife.id)
+        nodes.push({
+          id: wife.id,
+          type: 'personNode',
+          position: {
+            x: husbandNode.position.x + SPOUSE_OFFSET,
+            y: husbandNode.position.y
+          },
+          data: {
+            person: wife,
+            spouses: [persons.find(p => p.id === marriage.husband_id)!].filter(Boolean),
+            isCollapsed: false,
+            hasChildren: false,
+            generation: wife.generation
+          }
+        })
+      }
+    }
+
+    // Spouse edge
+    if (husbandNode || wifeNode) {
+      edges.push({
+        id: `marriage-${marriage.id}`,
+        source: marriage.husband_id,
+        target: marriage.wife_id,
+        type: 'default',
+        style: { stroke: '#A5D6A7', strokeWidth: 1.5, strokeDasharray: '5,5' },
+        data: { relation: 'spouse' },
+        animated: false
+      })
+    }
+  }
+
+  return { nodes, edges }
+}
+
+// Format year from date string
+export function formatYear(dateStr?: string | null): string | null {
+  if (!dateStr) return null
+  return new Date(dateStr).getFullYear().toString()
+}
+
+export function formatDateRange(birthDate?: string | null, deathDate?: string | null, isAlive?: boolean): string {
+  const birth = formatYear(birthDate)
+  if (isAlive) return birth ? `b. ${birth}` : ''
+  const death = formatYear(deathDate)
+  if (birth && death) return `${birth} – ${death}`
+  if (birth) return `b. ${birth}`
+  if (death) return `d. ${death}`
+  return ''
+}
