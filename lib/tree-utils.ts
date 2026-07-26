@@ -90,7 +90,26 @@ export function buildTreeLayout(
 
   // Find roots (no parent or parent not in our data)
   const personIds = new Set(persons.map(p => p.id))
-  const roots = persons.filter(p => !p.parent_id || !personIds.has(p.parent_id))
+  let roots = persons.filter(p => !p.parent_id || !personIds.has(p.parent_id))
+
+  // Prevent married-in spouses from becoming independent roots far to the right
+  const marriedIn = new Set<string>()
+  for (const m of marriages) {
+    const husband = persons.find(p => p.id === m.husband_id)
+    const wife = persons.find(p => p.id === m.wife_id)
+    if (husband && wife) {
+      if (husband.parent_id && !wife.parent_id) {
+        marriedIn.add(wife.id)
+      } else if (wife.parent_id && !husband.parent_id) {
+        marriedIn.add(husband.id)
+      } else if (!husband.parent_id && !wife.parent_id) {
+        // Both are roots, arbitrarily set wife as married-in to collapse them
+        marriedIn.add(wife.id)
+      }
+    }
+  }
+
+  roots = roots.filter(p => !marriedIn.has(p.id))
 
   const nodes: TreeNode[] = []
   const edges: TreeEdge[] = []
@@ -212,6 +231,27 @@ export function buildTreeLayout(
             isCollapsed: false,
             hasChildren: false,
             generation: wife.generation
+          }
+        })
+      }
+    } else if (wifeNode && !husbandNode && !addedSpouseNodes.has(marriage.husband_id)) {
+      // Husband is a "married-in" person not in main tree
+      const husband = persons.find(p => p.id === marriage.husband_id)
+      if (husband) {
+        addedSpouseNodes.add(husband.id)
+        nodes.push({
+          id: husband.id,
+          type: 'personNode',
+          position: {
+            x: wifeNode.position.x + SPOUSE_OFFSET,
+            y: wifeNode.position.y
+          },
+          data: {
+            person: husband,
+            spouses: [persons.find(p => p.id === marriage.wife_id)!].filter(Boolean),
+            isCollapsed: false,
+            hasChildren: false,
+            generation: husband.generation
           }
         })
       }
