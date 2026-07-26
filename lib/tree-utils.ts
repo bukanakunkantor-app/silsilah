@@ -73,9 +73,9 @@ function buildSpouseMap(persons: Person[], marriages: Marriage[]): Map<string, P
   return spouseMap
 }
 
-const HORIZONTAL_SPACING = 150
-const VERTICAL_SPACING = 200
-const SPOUSE_OFFSET = 105
+const HORIZONTAL_SPACING = 130 // Very compact spacing for normal siblings
+const VERTICAL_SPACING = 200 // Tall vertical for generation dividers
+const SPOUSE_OFFSET = 110 // 100px node width + 10px gap (sebelahan dekat)
 
 // Layout the tree using BFS with custom positioning
 export function buildTreeLayout(
@@ -113,9 +113,11 @@ export function buildTreeLayout(
     if (children.length === 0) {
       // Leaf node
       const x = xCounter * HORIZONTAL_SPACING
-      xCounter++
-
       const spouses = spouseMap.get(person.id) || []
+      
+      // Advance xCounter based on how many spouses this leaf node has
+      xCounter += (1 + spouses.length)
+
       nodes.push({
         id: person.id,
         type: 'personNode',
@@ -133,7 +135,6 @@ export function buildTreeLayout(
 
     // Layout children first
     const childPositions: number[] = []
-    childStartX = xCounter * HORIZONTAL_SPACING
 
     for (const child of children) {
       const childX = layoutSubtree(child, depth + 1)
@@ -168,6 +169,13 @@ export function buildTreeLayout(
         generation: person.generation
       }
     })
+
+    // Ensure the global xCounter clears the parent's spouses so the next sibling tree doesn't overlap
+    const parentRightBoundary = parentX + (spouses.length * SPOUSE_OFFSET)
+    const neededXCounter = Math.ceil(parentRightBoundary / HORIZONTAL_SPACING) + 1
+    if (xCounter < neededXCounter) {
+      xCounter = neededXCounter
+    }
 
     return parentX
   }
