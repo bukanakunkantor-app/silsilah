@@ -43,7 +43,8 @@
 }
 
 .title {
-  font-size: var(--font-size-base);
+  font-family: var(--font-family-serif);
+  font-size: var(--font-size-lg);
   font-weight: 800;
   color: var(--color-text-primary);
   white-space: nowrap;
@@ -180,8 +181,8 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #BBDEFB, #42A5F5);
-  border: 2px solid #90CAF9;
+  background: linear-gradient(135deg, #D4E2E8, #2D4A57);
+  border: 2px solid #A4BCC6;
   flex-shrink: 0;
 }
 
@@ -189,15 +190,15 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FCE4EC, #EC407A);
-  border: 2px solid #F48FB1;
+  background: linear-gradient(135deg, #EAD6D1, #7A3C2F);
+  border: 2px solid #D8AFA6;
   flex-shrink: 0;
 }
 
 .legendLineParent {
   width: 20px;
   height: 2px;
-  background: #81C784;
+  background: var(--color-accent);
   border-radius: 1px;
   flex-shrink: 0;
 }
@@ -205,9 +206,9 @@
 .legendLineSpouse {
   width: 20px;
   height: 2px;
-  background: #A5D6A7;
+  background: transparent;
   border-style: dashed;
-  border-top: 2px dashed #A5D6A7;
+  border-top: 2px dashed var(--color-primary-light);
   height: 0;
   flex-shrink: 0;
 }

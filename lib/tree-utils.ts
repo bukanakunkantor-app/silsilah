@@ -165,7 +165,7 @@ export function buildTreeLayout(
         source: person.id,
         target: child.id,
         type: 'smoothstep',
-        style: { stroke: '#81C784', strokeWidth: 2 },
+        style: { stroke: 'var(--color-accent)', strokeWidth: 2 },
         data: { relation: 'parent-child' }
       })
     }
@@ -264,7 +264,7 @@ export function buildTreeLayout(
         source: marriage.husband_id,
         target: marriage.wife_id,
         type: 'default',
-        style: { stroke: '#A5D6A7', strokeWidth: 1.5, strokeDasharray: '5,5' },
+        style: { stroke: 'var(--color-primary-light)', strokeWidth: 1.5, strokeDasharray: '5,5' },
         data: { relation: 'spouse' },
         animated: false
       })

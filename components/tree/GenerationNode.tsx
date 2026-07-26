@@ -19,10 +19,11 @@ function GenerationNode({ data }: any) {
           background: 'var(--color-bg)',
           padding: '4px 12px',
           borderRadius: '16px',
-          color: 'var(--color-text-muted)',
-          fontSize: '12px',
+          color: 'var(--color-primary-light)',
+          fontFamily: 'var(--font-family-serif)',
+          fontSize: '13px',
           fontWeight: 700,
-          border: '1px solid var(--color-border-light)',
+          border: '1px solid var(--color-accent-light)',
           boxShadow: 'var(--shadow-sm)'
         }}
       >
