@@ -19,6 +19,7 @@ import '@xyflow/react/dist/style.css'
 import { Person, Marriage } from '@/lib/supabase'
 import { buildTreeLayout, TreeNode, TreeEdge } from '@/lib/tree-utils'
 import PersonNode from './PersonNode'
+import GenerationNode from './GenerationNode'
 import SearchBar from './SearchBar'
 import DetailPanel from './DetailPanel'
 import styles from './FamilyTree.module.css'
@@ -29,7 +30,10 @@ interface FamilyTreeProps {
   familyName?: string
 }
 
-const nodeTypes = { personNode: PersonNode }
+const nodeTypes = {
+  personNode: PersonNode,
+  generationNode: GenerationNode,
+}
 
 function FamilyTreeInner({ persons, marriages, familyName = 'Silsilah Keluarga' }: FamilyTreeProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
