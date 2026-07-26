@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { isAdmin } from '@/lib/auth'
 import { supabase, Person } from '@/lib/supabase'
+import DateSelect from './DateSelect'
 import styles from './form.module.css'
 
 interface MemberFormProps {
@@ -282,13 +283,10 @@ export default function MemberForm({ editPerson }: MemberFormProps) {
             {/* Birth date */}
             <div className="form-group">
               <label className="form-label" htmlFor="birth_date">Tanggal Lahir</label>
-              <input
+              <DateSelect
                 id="birth_date"
-                type="date"
                 value={form.birth_date}
-                onChange={e => set('birth_date', e.target.value)}
-                className="form-input"
-                max={new Date().toISOString().split('T')[0]}
+                onChange={val => set('birth_date', val)}
               />
             </div>
 
@@ -334,13 +332,10 @@ export default function MemberForm({ editPerson }: MemberFormProps) {
             {!form.is_alive && (
               <div className="form-group" style={{ gridColumn: '1 / -1' }}>
                 <label className="form-label" htmlFor="death_date">Tanggal Wafat</label>
-                <input
+                <DateSelect
                   id="death_date"
-                  type="date"
                   value={form.death_date}
-                  onChange={e => set('death_date', e.target.value)}
-                  className="form-input"
-                  max={new Date().toISOString().split('T')[0]}
+                  onChange={val => set('death_date', val)}
                 />
               </div>
             )}
@@ -410,12 +405,10 @@ export default function MemberForm({ editPerson }: MemberFormProps) {
                     <label className="form-label" htmlFor="marriage_date">
                       Tanggal Nikah <span>(opsional)</span>
                     </label>
-                    <input
+                    <DateSelect
                       id="marriage_date"
-                      type="date"
                       value={form.marriage_date}
-                      onChange={e => set('marriage_date', e.target.value)}
-                      className="form-input"
+                      onChange={val => set('marriage_date', val)}
                     />
                   </div>
                 )}
